@@ -18,8 +18,8 @@ db:
   user: "postgres"
   pass: "activiti"
 javaOpts:
-  xmx: 768m
-  xms: 512m
+  xmx: 1024m
+  xms: 768m
   other: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
 service:
   name: ttc-query-campaign
@@ -31,10 +31,10 @@ service:
 resources:
   limits:
     cpu: 700m
-    memory: 1000Mi
+    memory: 1200Mi
   requests:
     cpu: 500m
-    memory: 768Mi
+    memory: 1200Mi
 probePath: /actuator/health
 livenessProbe:
   initialDelaySeconds: 120
