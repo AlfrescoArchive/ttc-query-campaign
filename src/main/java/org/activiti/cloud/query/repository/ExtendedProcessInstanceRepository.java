@@ -1,4 +1,4 @@
-package org.activiti.cloud.query;
+package org.activiti.cloud.query.repository;
 
 import org.activiti.cloud.services.query.app.repository.ProcessInstanceRepository;
 import org.activiti.cloud.services.query.model.ProcessInstance;
