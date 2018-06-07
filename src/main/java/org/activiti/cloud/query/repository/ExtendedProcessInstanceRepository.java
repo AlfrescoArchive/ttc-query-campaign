@@ -13,4 +13,14 @@ public interface ExtendedProcessInstanceRepository extends ProcessInstanceReposi
                      "select v from Variable v where v.name= 'matched' and v.value='true' and v.processInstance = pi)")
     Page<ProcessInstance> findAllCompletedAndMatched(@Param("campaign") String campaign,
                                                      Pageable pageable);
+
+    @Query("select pi from ProcessInstance pi where pi.status='COMPLETED' and pi.businessKey= :campaign and exists ( " +
+            "select v from Variable v where v.name= 'matched' and v.value='false' and v.processInstance = pi)")
+    Page<ProcessInstance> findAllCompletedAndDiscarded(@Param("campaign") String campaign,
+                                                     Pageable pageable);
+
+    @Query("select pi from ProcessInstance pi where pi.status='RUNNING' and pi.businessKey= :campaign and not exists ( " +
+            "select v from Variable v where v.name= 'matched' and v.processInstance = pi)")
+    Page<ProcessInstance> findAllInFlight(@Param("campaign") String campaign,
+                                                       Pageable pageable);
 }

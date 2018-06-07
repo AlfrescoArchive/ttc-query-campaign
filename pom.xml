@@ -34,6 +34,14 @@
           <groupId>org.activiti.cloud</groupId>
           <artifactId>activiti-cloud-services-identity-keycloak</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.activiti.cloud</groupId>
+          <artifactId>activiti-cloud-services-query-graphql</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.activiti.cloud</groupId>
+          <artifactId>activiti-cloud-services-query-graphql-ws</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
