@@ -3,9 +3,9 @@ package org.activiti.cloud.query.controller;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.cloud.query.repository.ExtendedProcessInstanceRepository;
 import org.activiti.cloud.query.QueryApplication;
 import org.activiti.cloud.query.model.Tweet;
+import org.activiti.cloud.query.repository.ExtendedProcessInstanceRepository;
 import org.activiti.cloud.services.query.model.ProcessInstance;
 import org.activiti.cloud.services.query.model.Variable;
 import org.slf4j.Logger;
@@ -45,6 +45,45 @@ public class ProcessedFeedController {
         Page<ProcessInstance> matchedProcessInstances = repository.findAllCompletedAndMatched(campaign,
                                                                                               pageable);
         List<Tweet> tweets = new ArrayList<>();
+        createTweetsFromProcessInstances(matchedProcessInstances,
+                                         tweets);
+        return pagedResourcesAssembler.toResource(new PageImpl<Tweet>(tweets,
+                                                                      pageable,
+                                                                      matchedProcessInstances.getTotalElements()));
+    }
+
+    @RequestMapping(path = "/inflight/{campaign}")
+    public PagedResources<Resource<Tweet>> getInFlightTweets(
+            @PathVariable("campaign") String campaign,
+            Pageable pageable) {
+
+        Page<ProcessInstance> matchedProcessInstances = repository.findAllInFlight(campaign,
+                                                                                   pageable);
+        List<Tweet> tweets = new ArrayList<>();
+        createTweetsFromProcessInstances(matchedProcessInstances,
+                                         tweets);
+        return pagedResourcesAssembler.toResource(new PageImpl<Tweet>(tweets,
+                                                                      pageable,
+                                                                      matchedProcessInstances.getTotalElements()));
+    }
+
+    @RequestMapping(path = "/discarded/{campaign}")
+    public PagedResources<Resource<Tweet>> getDiscardedTweets(
+            @PathVariable("campaign") String campaign,
+            Pageable pageable) {
+
+        Page<ProcessInstance> matchedProcessInstances = repository.findAllCompletedAndDiscarded(campaign,
+                                                                                                pageable);
+        List<Tweet> tweets = new ArrayList<>();
+        createTweetsFromProcessInstances(matchedProcessInstances,
+                                         tweets);
+        return pagedResourcesAssembler.toResource(new PageImpl<Tweet>(tweets,
+                                                                      pageable,
+                                                                      matchedProcessInstances.getTotalElements()));
+    }
+
+    private void createTweetsFromProcessInstances(Page<ProcessInstance> matchedProcessInstances,
+                                                  List<Tweet> tweets) {
         for (ProcessInstance matchedPI : matchedProcessInstances.getContent()) {
 
             Variable text = getVariableByName(matchedPI,
@@ -65,9 +104,6 @@ public class ProcessedFeedController {
                                      (timestamp != null) ? new Long(timestamp.getValue()) : new Long(0)));
             }
         }
-        return pagedResourcesAssembler.toResource(new PageImpl<Tweet>(tweets,
-                                                                      pageable,
-                                                                      matchedProcessInstances.getTotalElements()));
     }
 
     private Variable getVariableByName(ProcessInstance pi,
