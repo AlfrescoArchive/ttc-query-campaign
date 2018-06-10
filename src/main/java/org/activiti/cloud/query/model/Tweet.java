@@ -44,4 +44,15 @@ public class Tweet implements Serializable {
     public String getAttitude() {
         return attitude;
     }
+
+    @Override
+    public String toString() {
+        return "Tweet{" +
+                "text='" + text + '\'' +
+                ", author='" + author + '\'' +
+                ", lang='" + lang + '\'' +
+                ", attitude='" + attitude + '\'' +
+                ", timestamp=" + timestamp +
+                '}';
+    }
 }
