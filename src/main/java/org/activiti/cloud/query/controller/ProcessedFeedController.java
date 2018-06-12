@@ -1,13 +1,11 @@
 package org.activiti.cloud.query.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.cloud.query.QueryApplication;
 import org.activiti.cloud.query.model.Tweet;
 import org.activiti.cloud.query.repository.ExtendedProcessInstanceRepository;
 import org.activiti.cloud.services.query.model.ProcessInstance;
-import org.activiti.cloud.services.query.model.Variable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +36,7 @@ public class ProcessedFeedController {
 
     @RequestMapping(path = "/")
     public String helloFromQuery() {
-        return "Hello from the Trending Topic Campaigns Query Service";
+        return "{ 'welcome':'Hello from the Trending Topic Campaigns Query Service' } ";
     }
 
     @RequestMapping(path = "/processed/{campaign}")
@@ -81,6 +79,4 @@ public class ProcessedFeedController {
                                                                       pageable,
                                                                       matchedProcessInstances.getTotalElements()));
     }
-
-
 }
