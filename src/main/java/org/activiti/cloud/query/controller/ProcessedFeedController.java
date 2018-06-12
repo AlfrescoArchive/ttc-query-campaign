@@ -36,7 +36,7 @@ public class ProcessedFeedController {
 
     @RequestMapping(path = "/")
     public String helloFromQuery() {
-        return "{ 'welcome':'Hello from the Trending Topic Campaigns Query Service' } ";
+        return "{ \"welcome\":\"Hello from the Trending Topic Campaigns Query Service\" } ";
     }
 
     @RequestMapping(path = "/processed/{campaign}")
