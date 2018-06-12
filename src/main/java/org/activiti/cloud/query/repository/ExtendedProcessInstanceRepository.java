@@ -31,7 +31,7 @@ public interface ExtendedProcessInstanceRepository extends ProcessInstanceReposi
             "select v from Variable v where v.name= 'matched' and v.value='true' and v.processInstance = pi) order by pi.lastModified desc")
     List<ProcessInstance> findAllCompletedAndMatchedSince(@Param("campaign") String campaign, @Param("since") Date since);
 
-    @Query("select pi from ProcessInstance pi where pi.status='COMPLETED' and pi.businessKey= :campaign and pi.lastModified > :since and exists ( " +
-            "select v from Variable v where v.name= 'matched' and v.value='false' and v.processInstance = pi) order by pi.lastModified desc")
+    @Query("select pi from ProcessInstance pi where pi.status='COMPLETED' and pi.businessKey= :campaign and pi.lastModified > :since and not exists ( " +
+            "select v from Variable v where v.name= 'matched' and v.processInstance = pi) order by pi.lastModified desc")
     List<ProcessInstance> findAllCompletedAndDiscardedSince(@Param("campaign") String campaign, @Param("since") Date since);
 }
