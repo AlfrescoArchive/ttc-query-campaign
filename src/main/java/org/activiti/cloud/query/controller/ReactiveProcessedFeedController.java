@@ -1,11 +1,11 @@
 package org.activiti.cloud.query.controller;
 
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.transaction.Transactional;
 
 import org.activiti.cloud.query.QueryApplication;
@@ -16,15 +16,14 @@ import org.activiti.cloud.services.query.model.ProcessInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Scheduler;
 
 import static org.activiti.cloud.query.controller.ControllersUtil.createTweetsFromProcessInstances;
 
@@ -37,38 +36,51 @@ public class ReactiveProcessedFeedController {
 
     private Logger logger = LoggerFactory.getLogger(QueryApplication.class);
 
-    private Map<String, List<Tweet>> cacheTweetsForFlux = new HashMap<>();
+    private Map<String, List<Tweet>> cacheProcessedTweetsForFlux = new HashMap<>();
 
-    private final Scheduler scheduler;
+    private Map<String, List<Tweet>> cacheDiscardedTweetsForFlux = new HashMap<>();
 
     @Autowired
     private QueryConfiguration queryConfiguration;
 
-    public ReactiveProcessedFeedController(@Qualifier("myScheduler") Scheduler scheduler) {
-        this.scheduler = scheduler;
-    }
-
-    @RequestMapping(path = "/reactive/processed/{campaign}")
+    @RequestMapping(path = "/reactive/processed/{campaign}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<Tweet> getProcessedTweets(@PathVariable("campaign") String campaign,
                                           Pageable pageable) {
-        logger.info(">>> Request campaign feed check for: " + campaign);
-        if (cacheTweetsForFlux.get(campaign) == null) {
-            cacheTweetsForFlux.put(campaign,
-                                   new ArrayList<>());
+
+        if (cacheProcessedTweetsForFlux.get(campaign) == null) {
+            cacheProcessedTweetsForFlux.put(campaign,
+                                            new CopyOnWriteArrayList<>());
         }
-        return Flux.fromIterable(cacheTweetsForFlux.get(campaign)).subscribeOn(scheduler);
+
+        return Flux.interval(Duration.ofSeconds(5)).flatMapIterable(list -> cacheProcessedTweetsForFlux.get(campaign));
+    }
+
+    @RequestMapping(path = "/reactive/discarded/{campaign}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<Tweet> getDiscardedTweets(@PathVariable("campaign") String campaign,
+                                          Pageable pageable) {
+
+        if (cacheDiscardedTweetsForFlux.get(campaign) == null) {
+            cacheDiscardedTweetsForFlux.put(campaign,
+                                            new CopyOnWriteArrayList<>());
+        }
+
+        return Flux.interval(Duration.ofSeconds(5)).flatMapIterable(list -> cacheDiscardedTweetsForFlux.get(campaign));
     }
 
     @Scheduled(fixedRateString = "${query.refresh}")
     @Transactional
-    public void checkForNewTweetsForAllCampaigns() {
-        logger.info(">>> Triggering campaign feed check for: " + cacheTweetsForFlux.keySet() + " every: " + queryConfiguration.getRefresh());
-        for (String campaign : cacheTweetsForFlux.keySet()) {
+    public void refreshCampaignFeed() {
+        for (String campaign : cacheProcessedTweetsForFlux.keySet()) {
             List<ProcessInstance> matchedProcessInstances = repository.findAllCompletedAndMatchedSince(campaign,
                                                                                                        new Date(System.currentTimeMillis() - queryConfiguration.getRefresh()));
             List<Tweet> tweetsFromProcessInstances = createTweetsFromProcessInstances(matchedProcessInstances);
-            cacheTweetsForFlux.get(campaign).addAll(tweetsFromProcessInstances);
-            cacheTweetsForFlux.get(campaign).sort((o1, o2) -> (o1.getTimestamp() > o2.getTimestamp()) ? -1 : 1);
+
+            cacheProcessedTweetsForFlux.get(campaign).addAll(tweetsFromProcessInstances);
+
+            List<ProcessInstance> discardedProcessInstances = repository.findAllCompletedAndDiscardedSince(campaign,
+                                                                                                         new Date(System.currentTimeMillis() - queryConfiguration.getRefresh()));
+            List<Tweet> discardedTweetsFromProcessInstances = createTweetsFromProcessInstances(discardedProcessInstances);
+            cacheDiscardedTweetsForFlux.get(campaign).addAll(discardedTweetsFromProcessInstances);
         }
     }
 }
