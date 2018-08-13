@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.cloud.query.model.Tweet;
-import org.activiti.cloud.services.query.model.ProcessInstance;
-import org.activiti.cloud.services.query.model.Variable;
+import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
+import org.activiti.cloud.services.query.model.VariableEntity;
 import org.springframework.data.domain.Page;
 
 public class ControllersUtil {
 
-    public static List<Tweet> createTweetsFromProcessInstances(Page<ProcessInstance> matchedProcessInstances) {
+    public static List<Tweet> createTweetsFromProcessInstances(Page<ProcessInstanceEntity> matchedProcessInstances) {
         List<Tweet> tweets = new ArrayList<>(matchedProcessInstances.getSize());
-        for (ProcessInstance matchedPI : matchedProcessInstances.getContent()) {
+        for (ProcessInstanceEntity matchedPI : matchedProcessInstances.getContent()) {
 
             extractVariables(tweets,
                              matchedPI);
@@ -20,9 +20,9 @@ public class ControllersUtil {
         return tweets;
     }
 
-    public static List<Tweet> createTweetsFromProcessInstances(List<ProcessInstance> matchedProcessInstances) {
+    public static List<Tweet> createTweetsFromProcessInstances(List<ProcessInstanceEntity> matchedProcessInstances) {
         List<Tweet> tweets = new ArrayList<>(matchedProcessInstances.size());
-        for (ProcessInstance matchedPI : matchedProcessInstances) {
+        for (ProcessInstanceEntity matchedPI : matchedProcessInstances) {
 
             extractVariables(tweets,
                              matchedPI);
@@ -31,16 +31,16 @@ public class ControllersUtil {
     }
 
     private static void extractVariables(List<Tweet> tweets,
-                                         ProcessInstance matchedPI) {
-        Variable text = getVariableByName(matchedPI,
+                                         ProcessInstanceEntity matchedPI) {
+        VariableEntity text = getVariableByName(matchedPI,
                                           "text");
-        Variable author = getVariableByName(matchedPI,
+        VariableEntity author = getVariableByName(matchedPI,
                                             "author");
-        Variable lang = getVariableByName(matchedPI,
+        VariableEntity lang = getVariableByName(matchedPI,
                                           "lang");
-        Variable timestamp = getVariableByName(matchedPI,
+        VariableEntity timestamp = getVariableByName(matchedPI,
                                                "timestamp");
-        Variable attitude = getVariableByName(matchedPI,
+        VariableEntity attitude = getVariableByName(matchedPI,
                                               "attitude");
         if (text != null && author != null) {
             tweets.add(new Tweet(text.getValue(),
@@ -51,9 +51,9 @@ public class ControllersUtil {
         }
     }
 
-    private static Variable getVariableByName(ProcessInstance pi,
+    private static VariableEntity getVariableByName(ProcessInstanceEntity pi,
                                               String name) {
-        for (Variable v : pi.getVariables()) {
+        for (VariableEntity v : pi.getVariables()) {
             if (v.getName().equals(name)) {
                 return v;
             }

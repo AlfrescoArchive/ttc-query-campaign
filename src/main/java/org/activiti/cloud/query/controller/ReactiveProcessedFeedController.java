@@ -12,7 +12,7 @@ import org.activiti.cloud.query.QueryApplication;
 import org.activiti.cloud.query.configuration.QueryConfiguration;
 import org.activiti.cloud.query.model.Tweet;
 import org.activiti.cloud.query.repository.ExtendedProcessInstanceRepository;
-import org.activiti.cloud.services.query.model.ProcessInstance;
+import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,13 +71,13 @@ public class ReactiveProcessedFeedController {
     @Transactional
     public void refreshCampaignFeed() {
         for (String campaign : cacheProcessedTweetsForFlux.keySet()) {
-            List<ProcessInstance> matchedProcessInstances = repository.findAllCompletedAndMatchedSince(campaign,
+            List<ProcessInstanceEntity> matchedProcessInstances = repository.findAllCompletedAndMatchedSince(campaign,
                                                                                                        new Date(System.currentTimeMillis() - queryConfiguration.getRefresh()));
             List<Tweet> tweetsFromProcessInstances = createTweetsFromProcessInstances(matchedProcessInstances);
 
             cacheProcessedTweetsForFlux.get(campaign).addAll(tweetsFromProcessInstances);
 
-            List<ProcessInstance> discardedProcessInstances = repository.findAllCompletedAndDiscardedSince(campaign,
+            List<ProcessInstanceEntity> discardedProcessInstances = repository.findAllCompletedAndDiscardedSince(campaign,
                                                                                                          new Date(System.currentTimeMillis() - queryConfiguration.getRefresh()));
             List<Tweet> discardedTweetsFromProcessInstances = createTweetsFromProcessInstances(discardedProcessInstances);
             cacheDiscardedTweetsForFlux.get(campaign).addAll(discardedTweetsFromProcessInstances);

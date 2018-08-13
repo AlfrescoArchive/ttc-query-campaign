@@ -5,7 +5,7 @@ import java.util.List;
 import org.activiti.cloud.query.QueryApplication;
 import org.activiti.cloud.query.model.Tweet;
 import org.activiti.cloud.query.repository.ExtendedProcessInstanceRepository;
-import org.activiti.cloud.services.query.model.ProcessInstance;
+import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +44,7 @@ public class ProcessedFeedController {
             @PathVariable("campaign") String campaign,
             Pageable pageable) {
 
-        Page<ProcessInstance> matchedProcessInstances = repository.findAllCompletedAndMatched(campaign,
+        Page<ProcessInstanceEntity> matchedProcessInstances = repository.findAllCompletedAndMatched(campaign,
                                                                                               pageable);
         List<Tweet> tweets = createTweetsFromProcessInstances(matchedProcessInstances);
         return pagedResourcesAssembler.toResource(new PageImpl<Tweet>(tweets,
@@ -57,7 +57,7 @@ public class ProcessedFeedController {
             @PathVariable("campaign") String campaign,
             Pageable pageable) {
 
-        Page<ProcessInstance> matchedProcessInstances = repository.findAllInFlight(campaign,
+        Page<ProcessInstanceEntity> matchedProcessInstances = repository.findAllInFlight(campaign,
                                                                                    pageable);
         List<Tweet> tweets = createTweetsFromProcessInstances(matchedProcessInstances);
 
@@ -71,7 +71,7 @@ public class ProcessedFeedController {
             @PathVariable("campaign") String campaign,
             Pageable pageable) {
 
-        Page<ProcessInstance> matchedProcessInstances = repository.findAllCompletedAndDiscarded(campaign,
+        Page<ProcessInstanceEntity> matchedProcessInstances = repository.findAllCompletedAndDiscarded(campaign,
                                                                                                 pageable);
         List<Tweet> tweets = createTweetsFromProcessInstances(matchedProcessInstances);
 
