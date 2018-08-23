@@ -19,11 +19,8 @@ package org.activiti.cloud.query;
 import org.activiti.cloud.query.repository.ExtendedProcessInstanceRepository;
 import org.activiti.cloud.services.query.app.repository.ProcessInstanceRepository;
 import org.activiti.cloud.starter.query.configuration.EnableActivitiQuery;
-import org.apache.coyote.http11.Http11AprProtocol;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
