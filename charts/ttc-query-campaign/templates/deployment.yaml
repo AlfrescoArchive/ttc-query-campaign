@@ -18,7 +18,7 @@ spec:
 {{- end }}
     spec:
       containers:
-      - name: {{ .Chart.Name }}
+      - name: "{{ .Chart.Name }}"
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         env:
         - name: JAVA_OPTS
