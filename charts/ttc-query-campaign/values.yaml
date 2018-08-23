@@ -11,6 +11,8 @@ global:
       value: guest
     password:
       value: guest
+  keycloak:
+    url: ""
 javaOpts:
   xmx: 512m
   xms: 512m
