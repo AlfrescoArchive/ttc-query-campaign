@@ -18,11 +18,11 @@ spec:
 {{- end }}
     spec:
       containers:
-      - name: "{{ .Chart.Name }}"
+      - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         env:
         - name: JAVA_OPTS
-        value: -Xmx{{ .Values.javaOpts.xmx }} -Xms{{ .Values.javaOpts.xms }} {{ .Values.javaOpts.other}}
+          value: -Xmx{{ .Values.javaOpts.xmx }} -Xms{{ .Values.javaOpts.xms }} {{ .Values.javaOpts.other}}
         - name: SPRING_RABBITMQ_HOST
         {{- if .Values.global.rabbitmq.host.value }}
           value: {{ .Values.global.rabbitmq.host.value }}
