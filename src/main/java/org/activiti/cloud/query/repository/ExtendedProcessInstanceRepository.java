@@ -13,7 +13,7 @@ import org.springframework.data.repository.query.Param;
 public interface ExtendedProcessInstanceRepository extends ProcessInstanceRepository {
 
     @Query("select pi from ProcessInstance pi where pi.status='COMPLETED' and pi.businessKey= :campaign and exists ( " +
-                     "select v from Variable v where v.name= 'matched' and v.value='true' and v.processInstance = pi)")
+                     "select v from Variable v where v.name= 'matched' and v.value.value='true' and v.processInstance = pi)")
     Page<ProcessInstanceEntity> findAllCompletedAndMatched(@Param("campaign") String campaign,
                                                            Pageable pageable);
 
