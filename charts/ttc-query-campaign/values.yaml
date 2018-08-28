@@ -2,10 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 replicaCount: 1
-image:
-  repository: draft
-  tag: dev
-  pullPolicy: IfNotPresent
+
 global:
   rabbitmq:
     host:
@@ -14,13 +11,16 @@ global:
       value: guest
     password:
       value: guest
-db:
-  user: "postgres"
-  pass: "activiti"
+  keycloak:
+    url: ""
 javaOpts:
-  xmx: 1024m
-  xms: 768m
+  xmx: 512m
+  xms: 512m
   other: -XX:+UnlockExperimentalVMOptions -XX:+UseCGroupMemoryLimitForHeap -Dsun.zip.disableMemoryMapping=true -XX:+UseParallelGC -XX:MinHeapFreeRatio=5 -XX:MaxHeapFreeRatio=10 -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90
+image:
+  repository: draft
+  tag: dev
+  pullPolicy: IfNotPresent
 service:
   name: ttc-query-campaign
   type: ClusterIP
@@ -30,19 +30,19 @@ service:
     fabric8.io/expose: "true"
 resources:
   limits:
-    cpu: 700m
-    memory: 1200Mi
-  requests:
     cpu: 500m
-    memory: 1200Mi
+    memory: 768Mi
+  requests:
+    cpu: 400m
+    memory: 768Mi
 probePath: /actuator/health
 livenessProbe:
-  initialDelaySeconds: 120
+  initialDelaySeconds: 180
   periodSeconds: 10
   successThreshold: 1
-  timeoutSeconds: 1
+  timeoutSeconds: 4
 readinessProbe:
   periodSeconds: 90
   successThreshold: 1
-  timeoutSeconds: 1
+  timeoutSeconds: 4
 terminationGracePeriodSeconds: 10

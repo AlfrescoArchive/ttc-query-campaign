@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.activiti.cloud.query.controller.ControllersUtil.createTweetsFromProcessInstances;
 
+@RequestMapping(path = "/v1")
 @RestController
 @RefreshScope
 public class ProcessedFeedController {

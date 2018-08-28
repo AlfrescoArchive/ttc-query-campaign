@@ -11,7 +11,7 @@ spec:
     metadata:
       labels:
         draft: {{ default "draft-app" .Values.draft }}
-        app: {{ .Values.service.name }}
+        app: {{ template "fullname" . }}
 {{- if .Values.podAnnotations }}
       annotations:
 {{ toYaml .Values.podAnnotations | indent 8 }}
@@ -33,25 +33,8 @@ spec:
           value: {{ .Values.global.rabbitmq.username.value }}
         - name: SPRING_RABBITMQ_PASSWORD
           value: {{ .Values.global.rabbitmq.password.value }}
-        - name: ACT_QUERY_DB_URI
-        {{- if .Values.db.uri }}
-          value: {{ .Values.db.uri }}
-        {{ else }}
-          value: jdbc:postgresql://{{ .Release.Name }}-postgresql:5432/postgres
-        {{ end }}
-        - name: ACT_RB_DB_USER
-          value: {{ default "postgres" .Values.db.user }}
-        - name: ACT_RB_DB_PASS
-        {{- if .Values.db.pass }}
-          value: {{ .Values.db.pass }}
-        {{ else }}
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Release.Name }}-postgresql
-              key: postgres-password
-        {{ end }}
-        - name: ACT_RB_DB_PLATFORM
-          value: {{ default "org.hibernate.dialect.PostgreSQLDialect" .Values.db.platform }}
+        - name: ACT_KEYCLOAK_URL
+          value: "{{ .Values.global.keycloak.url }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: {{ .Values.service.internalPort }}
