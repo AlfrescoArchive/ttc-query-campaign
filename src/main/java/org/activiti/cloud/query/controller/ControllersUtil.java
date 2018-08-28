@@ -42,18 +42,12 @@ public class ControllersUtil {
                                                "timestamp");
         VariableEntity attitude = getVariableByName(matchedPI,
                                               "attitude");
-
-        System.out.println("Hello from extractVariables: value:" + timestamp.getValue().toString() +
-                                                        "class:" + timestamp.getValue().getClass() +
-                                                        "name: " + timestamp.getName());
-
-
         if (text != null && author != null) {
             tweets.add(new Tweet(text.getValue(),
                                  author.getValue(),
                                  (lang != null) ? lang.getValue() : "",
                                  (attitude != null) ? attitude.getValue() : "",
-                                 (timestamp != null) ? Long.valueOf(timestamp.getValue().toString()) : new Long(0)));
+                                 (timestamp != null) ? new Long(timestamp.getValue().toString()) : new Long(0)));
         }
     }
 

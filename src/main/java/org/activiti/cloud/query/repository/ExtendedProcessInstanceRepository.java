@@ -12,11 +12,6 @@ import org.springframework.data.repository.query.Param;
 
 public interface ExtendedProcessInstanceRepository extends ProcessInstanceRepository {
 
-    @Query("select pi from ProcessInstance pi where pi.status='COMPLETED' and pi.businessKey= :campaign and exists ( " +
-                     "select v from Variable v where v.name= 'matched' and v.value.value='true' and v.processInstance = pi)")
-    Page<ProcessInstanceEntity> findAllCompletedAndMatched(@Param("campaign") String campaign,
-                                                           Pageable pageable);
-
     @Query("select pi from ProcessInstance pi where pi.status='COMPLETED' and pi.businessKey= :campaign and not exists ( " +
             "select v from Variable v where v.name= 'matched' and v.processInstance = pi)")
     Page<ProcessInstanceEntity> findAllCompletedAndDiscarded(@Param("campaign") String campaign,
@@ -26,10 +21,6 @@ public interface ExtendedProcessInstanceRepository extends ProcessInstanceReposi
             "select v from Variable v where v.name= 'matched' and v.processInstance = pi)")
     Page<ProcessInstanceEntity> findAllInFlight(@Param("campaign") String campaign,
                                                        Pageable pageable);
-
-    @Query("select pi from ProcessInstance pi where pi.status='COMPLETED' and pi.businessKey= :campaign and pi.lastModified > :since and exists ( " +
-            "select v from Variable v where v.name= 'matched' and v.value.value='true' and v.processInstance = pi) order by pi.lastModified desc")
-    List<ProcessInstanceEntity> findAllCompletedAndMatchedSince(@Param("campaign") String campaign, @Param("since") Date since);
 
     @Query("select pi from ProcessInstance pi where pi.status='COMPLETED' and pi.businessKey= :campaign and pi.lastModified > :since and not exists ( " +
             "select v from Variable v where v.name= 'matched' and v.processInstance = pi) order by pi.lastModified desc")

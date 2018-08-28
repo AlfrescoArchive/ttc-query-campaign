@@ -1,11 +1,14 @@
 package org.activiti.cloud.query.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.cloud.query.QueryApplication;
 import org.activiti.cloud.query.model.Tweet;
 import org.activiti.cloud.query.repository.ExtendedProcessInstanceRepository;
+import org.activiti.cloud.query.repository.ExtendedVariableRepository;
 import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
+import org.activiti.cloud.services.query.model.VariableEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +33,14 @@ public class ProcessedFeedController {
     @Autowired
     private ExtendedProcessInstanceRepository repository;
 
+    @Autowired
+    private ExtendedVariableRepository variableRepository;
+
     private Logger logger = LoggerFactory.getLogger(QueryApplication.class);
 
     @Autowired
     private PagedResourcesAssembler<Tweet> pagedResourcesAssembler;
+
 
     @RequestMapping(path = "/")
     public String helloFromQuery() {
@@ -41,16 +48,26 @@ public class ProcessedFeedController {
     }
 
     @RequestMapping(path = "/processed/{campaign}")
-    public PagedResources<Resource<Tweet>> getProcessedTweets(
-            @PathVariable("campaign") String campaign,
-            Pageable pageable) {
+    public List<Tweet> getProcessedTweets(
+            @PathVariable("campaign") String campaign) {
 
-        Page<ProcessInstanceEntity> matchedProcessInstances = repository.findAllCompletedAndMatched(campaign,
-                                                                                              pageable);
+        List<VariableEntity> matchedVariables = variableRepository.findAllCompletedAndMatched(campaign);
+        List<ProcessInstanceEntity> matchedProcessInstancesList = new ArrayList<ProcessInstanceEntity>();
+
+        for(VariableEntity variableEntity:matchedVariables){
+
+            if(variableEntity.getName().equalsIgnoreCase("matched") && variableEntity.getType().equalsIgnoreCase("string")){
+                if(variableEntity.getValue()!=null &&variableEntity.getValue() instanceof String && ((String) variableEntity.getValue()).equalsIgnoreCase("true")){
+                    matchedProcessInstancesList.add(variableEntity.getProcessInstance());
+                }
+            }
+
+        }
+
+        List<ProcessInstanceEntity> matchedProcessInstances = new ArrayList<>(matchedProcessInstancesList);
+
         List<Tweet> tweets = createTweetsFromProcessInstances(matchedProcessInstances);
-        return pagedResourcesAssembler.toResource(new PageImpl<Tweet>(tweets,
-                                                                      pageable,
-                                                                      matchedProcessInstances.getTotalElements()));
+        return tweets;
     }
 
     @RequestMapping(path = "/inflight/{campaign}")
