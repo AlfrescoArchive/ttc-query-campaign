@@ -3,7 +3,7 @@ pipeline {
       label "jenkins-maven"
     }
     environment {
-      ORG               = 'miguelruizdev'
+      ORG               = 'Activiti'
       APP_NAME          = 'ttc-query-campaign'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
     }
