@@ -53,7 +53,7 @@ public class ControllersUtil {
                                  author.getValue(),
                                  (lang != null) ? lang.getValue() : "",
                                  (attitude != null) ? attitude.getValue() : "",
-                                 (timestamp != null) ? Long.valueOf(timestamp.getValue().toString()) : new Long(0)));
+                                 (timestamp != null) ? new Long(timestamp.getValue().toString()) : new Long(0)));
         }
     }
 

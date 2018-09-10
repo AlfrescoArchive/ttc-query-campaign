@@ -1,6 +1,7 @@
 package org.activiti.cloud.query.controller;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,9 @@ import org.activiti.cloud.query.QueryApplication;
 import org.activiti.cloud.query.configuration.QueryConfiguration;
 import org.activiti.cloud.query.model.Tweet;
 import org.activiti.cloud.query.repository.ExtendedProcessInstanceRepository;
+import org.activiti.cloud.query.repository.ExtendedVariableRepository;
 import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
+import org.activiti.cloud.services.query.model.VariableEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,8 @@ public class ReactiveProcessedFeedController {
 
     @Autowired
     private ExtendedProcessInstanceRepository repository;
+    @Autowired
+    private ExtendedVariableRepository variableRepository;
 
     private Logger logger = LoggerFactory.getLogger(QueryApplication.class);
 
@@ -71,8 +76,23 @@ public class ReactiveProcessedFeedController {
     @Transactional
     public void refreshCampaignFeed() {
         for (String campaign : cacheProcessedTweetsForFlux.keySet()) {
-            List<ProcessInstanceEntity> matchedProcessInstances = repository.findAllCompletedAndMatchedSince(campaign,
-                                                                                                       new Date(System.currentTimeMillis() - queryConfiguration.getRefresh()));
+            List<VariableEntity> matchedVariables = variableRepository.findAllCompletedAndMatchedSince(campaign,
+                    new Date(System.currentTimeMillis() - queryConfiguration.getRefresh()));
+            List<ProcessInstanceEntity> matchedProcessInstancesList = new ArrayList<ProcessInstanceEntity>();
+
+            for(VariableEntity variableEntity:matchedVariables){
+
+                if(variableEntity.getName().equalsIgnoreCase("matched") && variableEntity.getType().equalsIgnoreCase("string")){
+                    if(variableEntity.getValue()!=null &&variableEntity.getValue() instanceof String && ((String) variableEntity.getValue()).equalsIgnoreCase("true")){
+                        matchedProcessInstancesList.add(variableEntity.getProcessInstance());
+                    }
+                }
+
+            }
+
+            List<ProcessInstanceEntity> matchedProcessInstances = new ArrayList<>(matchedProcessInstancesList);
+
+
             List<Tweet> tweetsFromProcessInstances = createTweetsFromProcessInstances(matchedProcessInstances);
 
             cacheProcessedTweetsForFlux.get(campaign).addAll(tweetsFromProcessInstances);
