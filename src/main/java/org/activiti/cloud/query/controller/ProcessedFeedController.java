@@ -2,6 +2,7 @@ package org.activiti.cloud.query.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.activiti.cloud.query.QueryApplication;
 import org.activiti.cloud.query.model.Tweet;
@@ -105,8 +106,13 @@ public class ProcessedFeedController {
 
     @DeleteMapping(path = "/")
     public void cleanTweets(){
-        repository.deleteAll();
         variableRepository.deleteAll();
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        repository.deleteAll();
     }
 
 }
