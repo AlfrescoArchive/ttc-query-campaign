@@ -108,7 +108,7 @@ public class ProcessedFeedController {
     public void cleanTweets(){
         variableRepository.deleteAll();
         try {
-            TimeUnit.SECONDS.sleep(3);
+            TimeUnit.SECONDS.sleep(5);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
