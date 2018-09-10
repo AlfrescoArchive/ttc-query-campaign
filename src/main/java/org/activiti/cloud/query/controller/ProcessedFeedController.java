@@ -19,9 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedResources;
 import org.springframework.hateoas.Resource;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static org.activiti.cloud.query.controller.ControllersUtil.createTweetsFromProcessInstances;
 
@@ -48,11 +46,14 @@ public class ProcessedFeedController {
     }
 
     @RequestMapping(path = "/processed/{campaign}")
-    public List<Tweet> getProcessedTweets(
-            @PathVariable("campaign") String campaign) {
+    public PagedResources<Resource<Tweet>> getProcessedTweets(
+            @PathVariable("campaign") String campaign,
+            Pageable pageable) {
 
-        List<VariableEntity> matchedVariables = variableRepository.findAllCompletedAndMatched(campaign);
-        List<ProcessInstanceEntity> matchedProcessInstancesList = new ArrayList<ProcessInstanceEntity>();
+        Page<VariableEntity> matchedVariables = variableRepository.findAllCompletedAndMatched(campaign, pageable);
+
+
+        List<ProcessInstanceEntity> matchedProcessInstancesList = new ArrayList<>();
 
         for(VariableEntity variableEntity:matchedVariables){
 
@@ -64,10 +65,13 @@ public class ProcessedFeedController {
 
         }
 
-        List<ProcessInstanceEntity> matchedProcessInstances = new ArrayList<>(matchedProcessInstancesList);
+        Page<ProcessInstanceEntity> matchedProcessInstances = new PageImpl<>(matchedProcessInstancesList);
 
         List<Tweet> tweets = createTweetsFromProcessInstances(matchedProcessInstances);
-        return tweets;
+
+        return pagedResourcesAssembler.toResource(new PageImpl<>(tweets,
+                pageable,
+                matchedProcessInstances.getTotalElements()));
     }
 
     @RequestMapping(path = "/inflight/{campaign}")
@@ -79,7 +83,7 @@ public class ProcessedFeedController {
                                                                                    pageable);
         List<Tweet> tweets = createTweetsFromProcessInstances(matchedProcessInstances);
 
-        return pagedResourcesAssembler.toResource(new PageImpl<Tweet>(tweets,
+        return pagedResourcesAssembler.toResource(new PageImpl<>(tweets,
                                                                       pageable,
                                                                       matchedProcessInstances.getTotalElements()));
     }
@@ -93,8 +97,16 @@ public class ProcessedFeedController {
                                                                                                 pageable);
         List<Tweet> tweets = createTweetsFromProcessInstances(matchedProcessInstances);
 
-        return pagedResourcesAssembler.toResource(new PageImpl<Tweet>(tweets,
+        return pagedResourcesAssembler.toResource(new PageImpl<>(tweets,
                                                                       pageable,
                                                                       matchedProcessInstances.getTotalElements()));
     }
+
+
+    @DeleteMapping()
+    public void cleanTweets(){
+        repository.deleteAll();
+        variableRepository.deleteAll();
+    }
+
 }
