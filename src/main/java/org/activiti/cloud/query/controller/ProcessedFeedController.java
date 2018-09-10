@@ -106,12 +106,6 @@ public class ProcessedFeedController {
 
     @DeleteMapping(path = "/")
     public void cleanTweets(){
-//        variableRepository.deleteAll();
-//        try {
-//            TimeUnit.SECONDS.sleep(5);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
         repository.deleteAll();
     }
 
