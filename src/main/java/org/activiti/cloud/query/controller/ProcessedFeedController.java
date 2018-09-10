@@ -50,7 +50,7 @@ public class ProcessedFeedController {
             @PathVariable("campaign") String campaign,
             Pageable pageable) {
 
-        Page<VariableEntity> matchedVariables = variableRepository.findAllCompletedAndMatched(campaign, pageable);
+        List<VariableEntity> matchedVariables = variableRepository.findAllCompletedAndMatched(campaign);
 
 
         List<ProcessInstanceEntity> matchedProcessInstancesList = new ArrayList<>();
@@ -103,7 +103,7 @@ public class ProcessedFeedController {
     }
 
 
-    @DeleteMapping()
+    @DeleteMapping(path = "/")
     public void cleanTweets(){
         repository.deleteAll();
         variableRepository.deleteAll();

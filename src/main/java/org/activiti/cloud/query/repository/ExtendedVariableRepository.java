@@ -16,8 +16,7 @@ public interface ExtendedVariableRepository extends VariableRepository {
                      "and v.processInstance.status='COMPLETED' "+
                      "and v.processInstance.businessKey= :campaign " +
                      "order by v.processInstance.lastModified desc")
-    Page<VariableEntity> findAllCompletedAndMatched(@Param("campaign") String campaign,
-                                                    Pageable pageable);
+    List<VariableEntity> findAllCompletedAndMatched(@Param("campaign") String campaign);
 
     @Query("select v from Variable v where v.name= 'matched' " +
             "and v.processInstance.status='COMPLETED' "+

@@ -14,7 +14,7 @@ public interface ExtendedProcessInstanceRepository extends ProcessInstanceReposi
 
 
     @Query("select pi from ProcessInstance pi where pi.status='COMPLETED' and pi.businessKey= :campaign and not exists ( " +
-            "select v from Variable v where v.name= 'matched' and v.processInstance = pi) order by v.processInstance.lastModified desc")
+            "select v from Variable v where v.name= 'matched' and v.processInstance = pi) order by pi.lastModified desc")
     Page<ProcessInstanceEntity> findAllCompletedAndDiscarded(@Param("campaign") String campaign,
                                                      Pageable pageable);
 
