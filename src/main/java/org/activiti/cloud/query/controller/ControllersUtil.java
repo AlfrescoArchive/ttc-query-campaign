@@ -43,11 +43,6 @@ public class ControllersUtil {
         VariableEntity attitude = getVariableByName(matchedPI,
                                               "attitude");
 
-        System.out.println("Hello from extractVariables: value:" + timestamp.getValue().toString() +
-                                                        "class:" + timestamp.getValue().getClass() +
-                                                        "name: " + timestamp.getName());
-
-
         if (text != null && author != null) {
             tweets.add(new Tweet(text.getValue(),
                                  author.getValue(),
