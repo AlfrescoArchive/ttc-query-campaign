@@ -42,6 +42,7 @@ public class ControllersUtil {
                                                "timestamp");
         VariableEntity attitude = getVariableByName(matchedPI,
                                               "attitude");
+
         if (text != null && author != null) {
             tweets.add(new Tweet(text.getValue(),
                                  author.getValue(),
