@@ -9,7 +9,7 @@ import org.activiti.cloud.query.model.Tweet;
 import org.activiti.cloud.query.repository.ExtendedProcessInstanceRepository;
 import org.activiti.cloud.query.repository.ExtendedVariableRepository;
 import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
-import org.activiti.cloud.services.query.model.VariableEntity;
+import org.activiti.cloud.services.query.model.ProcessVariableEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +51,12 @@ public class ProcessedFeedController {
             @PathVariable("campaign") String campaign,
             Pageable pageable) {
 
-        List<VariableEntity> matchedVariables = variableRepository.findAllCompletedAndMatched(campaign);
+        List<ProcessVariableEntity> matchedVariables = variableRepository.findAllCompletedAndMatched(campaign);
 
 
         List<ProcessInstanceEntity> matchedProcessInstancesList = new ArrayList<>();
 
-        for(VariableEntity variableEntity:matchedVariables){
+        for(ProcessVariableEntity variableEntity:matchedVariables){
 
             if(variableEntity.getName().equalsIgnoreCase("matched") && variableEntity.getType().equalsIgnoreCase("string")){
                 if(variableEntity.getValue()!=null &&variableEntity.getValue() instanceof String && ((String) variableEntity.getValue()).equalsIgnoreCase("true")){
