@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.activiti.cloud.query.model.Tweet;
 import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
-import org.activiti.cloud.services.query.model.VariableEntity;
+import org.activiti.cloud.services.query.model.ProcessVariableEntity;
 import org.springframework.data.domain.Page;
 
 public class ControllersUtil {
@@ -32,15 +32,15 @@ public class ControllersUtil {
 
     private static void extractVariables(List<Tweet> tweets,
                                          ProcessInstanceEntity matchedPI) {
-        VariableEntity text = getVariableByName(matchedPI,
+        ProcessVariableEntity text = getVariableByName(matchedPI,
                                           "text");
-        VariableEntity author = getVariableByName(matchedPI,
+        ProcessVariableEntity author = getVariableByName(matchedPI,
                                             "author");
-        VariableEntity lang = getVariableByName(matchedPI,
+        ProcessVariableEntity lang = getVariableByName(matchedPI,
                                           "lang");
-        VariableEntity timestamp = getVariableByName(matchedPI,
+        ProcessVariableEntity timestamp = getVariableByName(matchedPI,
                                                "timestamp");
-        VariableEntity attitude = getVariableByName(matchedPI,
+        ProcessVariableEntity attitude = getVariableByName(matchedPI,
                                               "attitude");
 
         if (text != null && author != null) {
@@ -52,9 +52,9 @@ public class ControllersUtil {
         }
     }
 
-    private static VariableEntity getVariableByName(ProcessInstanceEntity pi,
+    private static ProcessVariableEntity getVariableByName(ProcessInstanceEntity pi,
                                               String name) {
-        for (VariableEntity v : pi.getVariables()) {
+        for (ProcessVariableEntity v : pi.getVariables()) {
             if (v.getName().equals(name)) {
                 return v;
             }
