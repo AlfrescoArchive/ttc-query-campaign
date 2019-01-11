@@ -22,9 +22,6 @@ pipeline {
             sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
             sh "mvn install"
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
-
-
-            sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
           }
 
           dir ('./charts/preview') {
@@ -37,14 +34,14 @@ pipeline {
       }
       stage('Build Release') {
         when {
-          branch 'develop'
+          branch 'master'
         }
         steps {
           container('maven') {
             // ensure we're not on a detached head
-            sh "git checkout develop"
+            sh "git checkout master"
             sh "git config --global credential.helper store"
-
+            sh "jx step validate --min-jx-version 1.1.73"
             sh "jx step git credentials"
             // so we can retrieve the version in later steps
             sh "echo \$(jx-release-version) > VERSION"
@@ -59,25 +56,21 @@ pipeline {
             sh 'mvn clean deploy'
 
             sh 'export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml'
-
-
             sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
-            sh "updatebot push-regex -r "\s+tag: (.*)" -v \$(cat VERSION) --previous-line "\s+repository: activiti/ttc-query-campaign" **/values.yaml) --merge false"
+            sh './updatebot.sh'
           }
         }
       }
       stage('Promote to Environments') {
         when {
-          branch 'develop'
+          branch 'master'
         }
         steps {
           dir ('./charts/ttc-query-campaign') {
             container('maven') {
               sh 'jx step changelog --version v\$(cat ../../VERSION)'
-
               // release the helm chart
-              sh 'jx step helm release'
-
+              sh 'make release'
               // promote through all 'Auto' promotion Environments
               sh 'jx promote -b --all-auto --timeout 1h --version \$(cat ../../VERSION)'
             }
